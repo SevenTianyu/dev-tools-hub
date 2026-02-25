@@ -302,6 +302,26 @@
                     <span class="tag">Encoder</span>
                 </div>
             </div>
+            
+            <div class="tool-card" onclick="openTool('html')">
+                <div class="tool-icon">📄</div>
+                <div class="tool-name" id="toolHtml">HTML 压缩/美化</div>
+                <div class="tool-desc" id="descHtml">HTML 代码压缩和格式化</div>
+                <div class="tool-tags">
+                    <span class="tag">HTML</span>
+                    <span class="tag">Minifier</span>
+                </div>
+            </div>
+            
+            <div class="tool-card" onclick="openTool('css')">
+                <div class="tool-icon">🎨</div>
+                <div class="tool-name" id="toolCss">CSS 压缩/美化</div>
+                <div class="tool-desc" id="descCss">CSS 代码压缩和格式化</div>
+                <div class="tool-tags">
+                    <span class="tag">CSS</span>
+                    <span class="tag">Minifier</span>
+                </div>
+            </div>
         </div>
         
         <footer>
@@ -339,6 +359,10 @@
                 descBase64: 'Base64 编码和解码，支持文本和图片',
                 toolUrl: 'URL 编解码',
                 descUrl: 'URL 编码和解码，处理特殊字符',
+                toolHtml: 'HTML 压缩/美化',
+                descHtml: 'HTML 代码压缩和格式化',
+                toolCss: 'CSS 压缩/美化',
+                descCss: 'CSS 代码压缩和格式化',
                 footerMain: '🛠️ DevTools - 开发者工具箱',
                 footerSub: '免费工具 · 无需注册 · 无广告',
                 statTools: '实用工具',
@@ -356,6 +380,10 @@
                 descBase64: 'Base64 encode and decode for text and images',
                 toolUrl: 'URL Codec',
                 descUrl: 'URL encode and decode for special characters',
+                toolHtml: 'HTML Minifier/Beautifier',
+                descHtml: 'HTML code minify and beautify',
+                toolCss: 'CSS Minifier/Beautifier',
+                descCss: 'CSS code minify and beautify',
                 footerMain: '🛠️ DevTools - Developer Toolkit',
                 footerSub: 'Free Tools · No Registration · No Ads',
                 statTools: 'Useful Tools',
@@ -395,6 +423,10 @@
             document.getElementById('descBase64').textContent = texts.descBase64;
             document.getElementById('toolUrl').textContent = texts.toolUrl;
             document.getElementById('descUrl').textContent = texts.descUrl;
+            document.getElementById('toolHtml').textContent = texts.toolHtml;
+            document.getElementById('descHtml').textContent = texts.descHtml;
+            document.getElementById('toolCss').textContent = texts.toolCss;
+            document.getElementById('descCss').textContent = texts.descCss;
             document.getElementById('footerMain').textContent = texts.footerMain;
             document.getElementById('footerSub').textContent = texts.footerSub;
             document.getElementById('statTools').textContent = texts.statTools;
@@ -425,20 +457,26 @@
             const urls = {
                 json: '/tools/json.html',
                 base64: '/tools/base64.html',
-                url: '/tools/url.html'
+                url: '/tools/url.html',
+                html: '/tools/html-minify.html',
+                css: '/tools/css.html'
             };
             
-            // For now, show alert that tool is coming soon
-            const toolNames = {
-                zh: { json: 'JSON 格式化', base64: 'Base64 编解码', url: 'URL 编解码' },
-                en: { json: 'JSON Formatter', base64: 'Base64 Codec', url: 'URL Codec' }
-            };
-            
-            const msg = currentLang === 'zh' 
-                ? `${toolNames.zh[tool]} 工具页面开发中，敬请期待！`
-                : `${toolNames.en[tool]} tool page is under development, coming soon!`;
-            
-            alert(msg);
+            if (urls[tool]) {
+                window.location.href = urls[tool];
+            } else {
+                // Fallback for tools not yet implemented
+                const toolNames = {
+                    zh: { json: 'JSON 格式化', base64: 'Base64 编解码', url: 'URL 编解码' },
+                    en: { json: 'JSON Formatter', base64: 'Base64 Codec', url: 'URL Codec' }
+                };
+                
+                const msg = currentLang === 'zh' 
+                    ? `${toolNames.zh[tool] || tool} 工具页面开发中，敬请期待！`
+                    : `${toolNames.en[tool] || tool} tool page is under development, coming soon!`;
+                
+                alert(msg);
+            }
         }
         
         // 初始化语言
