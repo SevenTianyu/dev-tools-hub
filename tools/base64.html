@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 Codec - DevTools</title>
+    <meta name="description" content="Online Base64 encoder and decoder. Convert text to Base64 and decode Base64 to text or images.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        
+        .back-btn:hover {
+            color: var(--primary);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .lang-switcher {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .lang-btn {
+            padding: 6px 12px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+        
+        .mode-switcher {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            background: var(--surface);
+            padding: 6px;
+            border-radius: 10px;
+            width: fit-content;
+        }
+        
+        .mode-btn {
+            padding: 10px 24px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tool-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .tool-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .panel-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #16a34a;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 16px;
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e6edf3;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+        
+        .upload-text {
+            color: var(--text-muted);
+        }
+        
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+        
+        .result-box {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 300px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            overflow: auto;
+        }
+        
+        .options {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .option label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .error-message {
+            color: var(--error);
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .success-message {
+            color: var(--success);
+            padding: 12px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="back-btn">← 返回工具箱</a>
+            <div class="logo">🛠️ DevTools</div>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+                <button class="lang-btn" onclick="setLang('en')">English</button>
+            </div>
+        </header>
+        
+        <h1>🔢 Base64 编解码</h1>
+        <p class="subtitle">文本和图片的 Base64 编码和解码工具</p>
+        
+        <div class="mode-switcher">
+            <button class="mode-btn active" onclick="setMode('text')" id="btnText">文本模式</button>
+            <button class="mode-btn" onclick="setMode('image')" id="btnImage">图片模式</button>
+        </div>
+        
+        <div class="options">
+            <div class="option">
+                <input type="checkbox" id="urlSafe" checked>
+                <label for="urlSafe">URL 安全</label>
+            </div>
+        </div>
+        
+        <div class="tool-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title" id="inputTitle">输入</span>
+                    <div class="panel-actions">
+                        <button class="btn btn-secondary" onclick="clearInput()">清空</button>
+                    </div>
+                </div>
+                
+                <div id="textInput">
+                    <textarea id="input" placeholder="在此输入要编码或解码的文本...">Hello, World!</textarea>
+                </div>
+                
+                <div id="imageInput" style="display: none;">
+                    <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                        <input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">点击上传图片或拖拽到此处</div>
+                    </div>
+                    <img id="imagePreview" class="image-preview" style="display: none;">
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title" id="outputTitle">结果</span>
+                    <div class="panel-actions">
+                        <button class="btn btn-success" onclick="encode()">🔒 编码</button>
+                        <button class="btn btn-secondary" onclick="decode()">🔓 解码</button>
+                        <button class="btn btn-secondary" onclick="copyResult()">📋 复制</button>
+                    </div>
+                </div>
+                <div id="output" class="result-box">点击"编码"或"解码"按钮查看结果...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const i18n = {
+            zh: {
+                back: '← 返回工具箱',
+                title: 'Base64 编解码',
+                subtitle: '文本和图片的 Base64 编码和解码工具',
+                modeText: '文本模式',
+                modeImage: '图片模式',
+                urlSafe: 'URL 安全',
+                input: '输入',
+                output: '结果',
+                placeholder: '在此输入要编码或解码的文本...',
+                uploadText: '点击上传图片或拖拽到此处',
+                clear: '清空',
+                encode: '🔒 编码',
+                decode: '🔓 解码',
+                copy: '📋 复制',
+                resultPlaceholder: '点击"编码"或"解码"按钮查看结果...',
+                copied: '已复制到剪贴板！',
+                encodeError: '编码错误：',
+                decodeError: '解码错误：无效 Base64 字符串',
+                fileError: '文件读取错误：'
+            },
+            en: {
+                back: '← Back to Tools',
+                title: 'Base64 Codec',
+                subtitle: 'Base64 encoder and decoder for text and images',
+                modeText: 'Text Mode',
+                modeImage: 'Image Mode',
+                urlSafe: 'URL Safe',
+                input: 'Input',
+                output: 'Output',
+                placeholder: 'Enter text to encode or decode...',
+                uploadText: 'Click to upload image or drag here',
+                clear: 'Clear',
+                encode: '🔒 Encode',
+                decode: '🔓 Decode',
+                copy: '📋 Copy',
+                resultPlaceholder: 'Click "Encode" or "Decode" to see result...',
+                copied: 'Copied to clipboard!',
+                encodeError: 'Encode error: ',
+                decodeError: 'Decode error: invalid Base64 string',
+                fileError: 'File read error: '
+            }
+        };
+        
+        let currentLang = 'zh';
+        let currentMode = 'text';
+        
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (lang === 'zh' && btn.textContent.includes('中文')) ||
+                    (lang === 'en' && btn.textContent.includes('English'))
+                );
+            });
+            
+            const t = i18n[lang];
+            document.querySelector('.back-btn').textContent = t.back;
+            document.querySelector('h1').textContent = '🔢 ' + t.title;
+            document.querySelector('.subtitle').textContent = t.subtitle;
+            
+            document.getElementById('btnText').textContent = t.modeText;
+            document.getElementById('btnImage').textContent = t.modeImage;
+            document.querySelector('label[for="urlSafe"]').textContent = t.urlSafe;
+            
+            document.getElementById('inputTitle').textContent = t.input;
+            document.querySelector('.btn-secondary').textContent = t.clear;
+            document.getElementById('outputTitle').textContent = t.output;
+            
+            document.querySelectorAll('.btn-success')[0].textContent = t.encode;
+            document.querySelectorAll('.btn-secondary')[1].textContent = t.decode;
+            document.querySelectorAll('.btn-secondary')[2].textContent = t.copy;
+            
+            document.getElementById('input').placeholder = t.placeholder;
+            document.querySelector('.upload-text').textContent = t.uploadText;
+            document.getElementById('output').textContent = t.resultPlaceholder;
+        }
+        
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (mode === 'text') {
+                document.getElementById('textInput').style.display = 'block';
+                document.getElementById('imageInput').style.display = 'none';
+            } else {
+                document.getElementById('textInput').style.display = 'none';
+                document.getElementById('imageInput').style.display = 'block';
+            }
+        }
+        
+        function encode() {
+            const input = document.getElementById('input').value;
+            const urlSafe = document.getElementById('urlSafe').checked;
+            const output = document.getElementById('output');
+            
+            try {
+                let encoded = btoa(unescape(encodeURIComponent(input)));
+                if (urlSafe) {
+                    encoded = encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+                }
+                output.textContent = encoded;
+            } catch (e) {
+                output.innerHTML = `<div class="error-message">${i18n[currentLang].encodeError} ${e.message}</div>`;
+            }
+        }
+        
+        function decode() {
+            const input = document.getElementById('input').value;
+            const urlSafe = document.getElementById('urlSafe').checked;
+            const output = document.getElementById('output');
+            
+            try {
+                let base64 = input;
+                if (urlSafe) {
+                    base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+                    while (base64.length % 4) base64 += '=';
+                }
+                const decoded = decodeURIComponent(escape(atob(base64)));
+                output.textContent = decoded;
+            } catch (e) {
+                output.innerHTML = `<div class="error-message">${i18n[currentLang].decodeError}</div>`;
+            }
+        }
+        
+        function handleFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagePreview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                
+                // Extract base64 from data URL
+                const base64 = e.target.result.split(',')[1];
+                document.getElementById('output').textContent = base64;
+            };
+            reader.onerror = function() {
+                document.getElementById('output').innerHTML = `<div class="error-message">${i18n[currentLang].fileError} ${reader.error}</div>`;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function copyResult() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                alert(i18n[currentLang].copied);
+            });
+        }
+        
+        function clearInput() {
+            document.getElementById('input').value = '';
+            document.getElementById('output').textContent = i18n[currentLang].resultPlaceholder;
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+        }
+        
+        // Auto encode on load
+        window.onload = () => {
+            const browserLang = navigator.language || navigator.userLanguage;
+            if (browserLang && browserLang.startsWith('en')) {
+                setLang('en');
+            }
+            encode();
+        };
+    </script>
+</body>
+</html>

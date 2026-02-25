@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter - DevTools</title>
+    <meta name="description" content="Online JSON formatter, validator and beautifier. Format, validate and edit JSON with syntax highlighting.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        
+        .back-btn:hover {
+            color: var(--primary);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .lang-switcher {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .lang-btn {
+            padding: 6px 12px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+        
+        .tool-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .tool-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .panel-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #16a34a;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 16px;
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e6edf3;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .output-area {
+            width: 100%;
+            min-height: 400px;
+            padding: 16px;
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e6edf3;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .json-key {
+            color: #7ee787;
+        }
+        
+        .json-string {
+            color: #a5d6ff;
+        }
+        
+        .json-number {
+            color: #79c0ff;
+        }
+        
+        .json-boolean {
+            color: #ff7b72;
+        }
+        
+        .json-null {
+            color: #ff7b72;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: var(--surface);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 20px;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .status-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .status-icon.valid {
+            background: var(--success);
+        }
+        
+        .status-icon.invalid {
+            background: var(--error);
+        }
+        
+        .status-text.valid {
+            color: var(--success);
+        }
+        
+        .status-text.invalid {
+            color: var(--error);
+        }
+        
+        .options {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .option label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .option input[type="number"] {
+            width: 60px;
+            padding: 4px 8px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+        }
+        
+        .error-message {
+            color: var(--error);
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="back-btn">← 返回工具箱</a>
+            <div class="logo">🛠️ DevTools</div>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+                <button class="lang-btn" onclick="setLang('en')">English</button>
+            </div>
+        </header>
+        
+        <h1>📋 JSON Formatter</h1>
+        <p class="subtitle">格式化、验证和美化你的 JSON 数据</p>
+        
+        <div class="options">
+            <div class="option">
+                <input type="checkbox" id="sortKeys" checked>
+                <label for="sortKeys">排序键名</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="escapeUnicode">
+                <label for="escapeUnicode">转义 Unicode</label>
+            </div>
+            <div class="option">
+                <label for="indentSize">缩进：</label>
+                <input type="number" id="indentSize" value="2" min="1" max="8">
+                <label>空格</label>
+            </div>
+        </div>
+        
+        <div class="tool-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">输入 JSON</span>
+                    <div class="panel-actions">
+                        <button class="btn btn-secondary" onclick="loadSample()">加载示例</button>
+                        <button class="btn btn-secondary" onclick="clearInput()">清空</button>
+                    </div>
+                </div>
+                <textarea id="input" placeholder="在此粘贴你的 JSON...">{
+  "name": "John Doe",
+  "age": 30,
+  "email": "john@example.com",
+  "address": {
+    "street": "123 Main St",
+    "city": "New York",
+    "country": "USA"
+  },
+  "hobbies": ["reading", "swimming", "coding"],
+  "isActive": true,
+  "balance": null
+}</textarea>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">格式化结果</span>
+                    <div class="panel-actions">
+                        <button class="btn btn-success" onclick="formatJSON()">✨ 格式化</button>
+                        <button class="btn btn-secondary" onclick="minifyJSON()">📦 压缩</button>
+                        <button class="btn btn-secondary" onclick="copyOutput()">📋 复制</button>
+                    </div>
+                </div>
+                <div id="output" class="output-area">点击"格式化"按钮查看结果...</div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <div class="status">
+                <span class="status-icon" id="statusIcon"></span>
+                <span class="status-text" id="statusText">等待输入...</span>
+            </div>            <div id="stats"></div>
+        </div>
+    </div>
+    
+    <script>
+        const i18n = {
+            zh: {
+                back: '← 返回工具箱',
+                title: 'JSON 格式化',
+                subtitle: '格式化、验证和美化你的 JSON 数据',
+                sortKeys: '排序键名',
+                escapeUnicode: '转义 Unicode',
+                indent: '缩进：',
+                spaces: '空格',
+                inputTitle: '输入 JSON',
+                loadSample: '加载示例',
+                clear: '清空',
+                outputTitle: '格式化结果',
+                format: '✨ 格式化',
+                minify: '📦 压缩',
+                copy: '📋 复制',
+                placeholder: '点击"格式化"按钮查看结果...',
+                waiting: '等待输入...',
+                valid: '✓ JSON 格式有效',
+                invalid: '✗ JSON 格式错误',
+                copied: '已复制到剪贴板！',
+                parseError: '解析错误：'
+            },
+            en: {
+                back: '← Back to Tools',
+                title: 'JSON Formatter',
+                subtitle: 'Format, validate and beautify your JSON data',
+                sortKeys: 'Sort Keys',
+                escapeUnicode: 'Escape Unicode',
+                indent: 'Indent:',
+                spaces: 'spaces',
+                inputTitle: 'Input JSON',
+                loadSample: 'Load Sample',
+                clear: 'Clear',
+                outputTitle: 'Formatted Result',
+                format: '✨ Format',
+                minify: '📦 Minify',
+                copy: '📋 Copy',
+                placeholder: 'Click "Format" button to see result...',
+                waiting: 'Waiting for input...',
+                valid: '✓ Valid JSON',
+                invalid: '✗ Invalid JSON',
+                copied: 'Copied to clipboard!',
+                parseError: 'Parse error: '
+            }
+        };
+        
+        let currentLang = 'zh';
+        
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (lang === 'zh' && btn.textContent.includes('中文')) ||
+                    (lang === 'en' && btn.textContent.includes('English'))
+                );
+            });
+            
+            const t = i18n[lang];
+            document.querySelector('.back-btn').textContent = t.back;
+            document.querySelector('h1').textContent = '📋 ' + t.title;
+            document.querySelector('.subtitle').textContent = t.subtitle;
+            
+            // Update options
+            document.querySelector('label[for="sortKeys"]').textContent = t.sortKeys;
+            document.querySelector('label[for="escapeUnicode"]').textContent = t.escapeUnicode;
+            document.querySelector('label[for="indentSize"]').textContent = t.indent;
+            document.querySelector('.option:last-child label:last-child').textContent = t.spaces;
+            
+            // Update panel titles and buttons
+            document.querySelectorAll('.panel-title')[0].textContent = t.inputTitle;
+            document.querySelectorAll('.btn-secondary')[0].textContent = t.loadSample;
+            document.querySelectorAll('.btn-secondary')[1].textContent = t.clear;
+            document.querySelectorAll('.panel-title')[1].textContent = t.outputTitle;
+            document.querySelectorAll('.btn-success')[0].textContent = t.format;
+            document.querySelectorAll('.btn-secondary')[2].textContent = t.minify;
+            document.querySelectorAll('.btn-secondary')[3].textContent = t.copy;
+            
+            document.getElementById('output').textContent = t.placeholder;
+            document.getElementById('statusText').textContent = t.waiting;
+        }
+        
+        function formatJSON() {
+            const input = document.getElementById('input').value;
+            const output = document.getElementById('output');
+            const indentSize = parseInt(document.getElementById('indentSize').value) || 2;
+            const sortKeys = document.getElementById('sortKeys').checked;
+            
+            try {
+                let obj = JSON.parse(input);
+                
+                if (sortKeys && typeof obj === 'object' && obj !== null) {
+                    obj = sortObjectKeys(obj);
+                }
+                
+                const formatted = JSON.stringify(obj, null, indentSize);
+                output.innerHTML = syntaxHighlight(formatted);
+                
+                setStatus(true);
+                updateStats(input, formatted);
+            } catch (e) {
+                output.innerHTML = `<div class="error-message">${i18n[currentLang].parseError} ${e.message}</div>`;
+                setStatus(false);
+            }
+        }
+        
+        function minifyJSON() {
+            const input = document.getElementById('input').value;
+            const output = document.getElementById('output');
+            
+            try {
+                const obj = JSON.parse(input);
+                const minified = JSON.stringify(obj);
+                output.textContent = minified;
+                setStatus(true);
+                updateStats(input, minified);
+            } catch (e) {
+                output.innerHTML = `<div class="error-message">${i18n[currentLang].parseError} ${e.message}</div>`;
+                setStatus(false);
+            }
+        }
+        
+        function sortObjectKeys(obj) {
+            if (Array.isArray(obj)) {
+                return obj.map(sortObjectKeys);
+            } else if (typeof obj === 'object' && obj !== null) {
+                const sorted = {};
+                Object.keys(obj).sort().forEach(key => {
+                    sorted[key] = sortObjectKeys(obj[key]);
+                });
+                return sorted;
+            }
+            return obj;
+        }
+        
+        function syntaxHighlight(json) {
+            return json.replace(/(".*?"|\d+|true|false|null|[{}[\],:])/g, match => {
+                if (/^".*"$/.test(match)) return '<span class="json-string">' + match + '</span>';
+                if (/\d/.test(match)) return '<span class="json-number">' + match + '</span>';
+                if (/true|false/.test(match)) return '<span class="json-boolean">' + match + '</span>';
+                if (match === 'null') return '<span class="json-null">' + match + '</span>';
+                if (/[{}[\]]/.test(match)) return '<span class="json-key">' + match + '</span>';
+                return match;
+            });
+        }
+        
+        function setStatus(isValid) {
+            const icon = document.getElementById('statusIcon');
+            const text = document.getElementById('statusText');
+            
+            icon.className = 'status-icon ' + (isValid ? 'valid' : 'invalid');
+            text.className = 'status-text ' + (isValid ? 'valid' : 'invalid');
+            text.textContent = isValid ? i18n[currentLang].valid : i18n[currentLang].invalid;
+        }
+        
+        function updateStats(input, output) {
+            const inputSize = new Blob([input]).size;
+            const outputSize = new Blob([output]).size;
+            const savings = ((1 - outputSize / inputSize) * 100).toFixed(1);
+            
+            document.getElementById('stats').textContent = 
+                `Input: ${inputSize} bytes | Output: ${outputSize} bytes | ${savings}%`;
+        }
+        
+        function copyOutput() {
+            const output = document.getElementById('output');
+            const text = output.textContent || output.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert(i18n[currentLang].copied);
+            });
+        }
+        
+        function loadSample() {
+            const sample = {
+                name: "John Doe",
+                age: 30,
+                email: "john@example.com",
+                address: {
+                    street: "123 Main St",
+                    city: "New York",
+                    country: "USA"
+                },
+                hobbies: ["reading", "swimming", "coding"],
+                isActive: true,
+                balance: null
+            };
+            document.getElementById('input').value = JSON.stringify(sample, null, 2);
+            formatJSON();
+        }
+        
+        function clearInput() {
+            document.getElementById('input').value = '';
+            document.getElementById('output').textContent = i18n[currentLang].placeholder;
+            document.getElementById('statusText').textContent = i18n[currentLang].waiting;
+            document.getElementById('statusIcon').className = 'status-icon';
+            document.getElementById('stats').textContent = '';
+        }
+        
+        // Auto format on load
+        window.onload = () => {
+            const browserLang = navigator.language || navigator.userLanguage;
+            if (browserLang && browserLang.startsWith('en')) {
+                setLang('en');
+            }
+            formatJSON();
+        };
+    </script>
+</body>
+</html>
