@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevTools - 开发者工具箱</title>
-    <meta name="description" content="免费的在线开发者工具集合，包括 JSON 格式化、Base64 编解码、URL 编解码、HTML 压缩美化、CSS 压缩美化等常用工具">
+    <title id="pageTitle">DevTools - Developer Toolkit</title>
+    <meta name="description" id="pageDesc" content="Free online developer tools collection including JSON formatter, Base64 codec, URL codec, HTML/CSS minifier and more">
+    
     <style>
         * {
             margin: 0;
@@ -46,6 +47,32 @@
             padding: 60px 20px 40px;
             background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
             border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+        
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .lang-btn {
+            padding: 6px 12px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .lang-btn:hover, .lang-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
         
         .logo {
@@ -229,8 +256,13 @@
 </head>
 <body>
     <header>
-        <div class="logo">🛠️ DevTools</div>
-        <p class="tagline">开发者工具箱 - 免费、快速、无需注册的在线工具集合</p>
+        <div class="lang-switcher">
+            <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+            <button class="lang-btn" onclick="setLang('en')">English</button>
+        </div>
+        
+        <div class="logo" id="logo">🛠️ DevTools</div>
+        <p class="tagline" id="tagline">开发者工具箱 - 免费、快速、无需注册的在线工具集合</p>
         
         <div class="search-box">
             <span class="search-icon">🔍</span>
@@ -239,209 +271,137 @@
     </header>
     
     <div class="container">
-        <div class="category-title"><span>📊</span> 数据格式化</div>
+        <div class="category-title" id="catFormat"><span>📊</span> 数据格式化</div>
         <div class="tools-grid">
             <div class="tool-card" onclick="openTool('json')">
                 <div class="tool-icon">📋</div>
-                <div class="tool-name">JSON 格式化</div>
-                <div class="tool-desc">JSON 美化、压缩、验证，支持语法高亮和错误提示</div>
+                <div class="tool-name" id="toolJson">JSON 格式化</div>
+                <div class="tool-desc" id="descJson">JSON 美化、压缩、验证，支持语法高亮和错误提示</div>
                 <div class="tool-tags">
-                    <span class="tag">格式化</span>
                     <span class="tag">JSON</span>
+                    <span class="tag">Formatter</span>
                 </div>
             </div>
             
-            <div class="tool-card" onclick="openTool('sql')">
-                <div class="tool-icon">🗄️</div>
-                <div class="tool-name">SQL 格式化</div>
-                <div class="tool-desc">SQL 语句美化、压缩，支持多种数据库语法</div>
-                <div class="tool-tags">
-                    <span class="tag">SQL</span>
-                    <span class="tag">数据库</span>
-                </div>
-            </div>
-            
-            <div class="tool-card" onclick="openTool('xml')">
-                <div class="tool-icon">📄</div>
-                <div class="tool-name">XML 格式化</div>
-                <div class="tool-desc">XML 美化、压缩、验证，支持语法高亮</div>
-                <div class="tool-tags">
-                    <span class="tag">XML</span>
-                    <span class="tag">格式化</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="category-title"><span>🔐</span> 编码解码</div>
-        <div class="tools-grid">
             <div class="tool-card" onclick="openTool('base64')">
                 <div class="tool-icon">🔢</div>
-                <div class="tool-name">Base64 编解码</div>
-                <div class="tool-desc">Base64 编码和解码，支持文本和图片</div>
+                <div class="tool-name" id="toolBase64">Base64 编解码</div>
+                <div class="tool-desc" id="descBase64">Base64 编码和解码，支持文本和图片</div>
                 <div class="tool-tags">
                     <span class="tag">Base64</span>
-                    <span class="tag">编码</span>
+                    <span class="tag">Codec</span>
                 </div>
             </div>
             
             <div class="tool-card" onclick="openTool('url')">
                 <div class="tool-icon">🔗</div>
-                <div class="tool-name">URL 编解码</div>
-                <div class="tool-desc">URL 编码和解码，处理特殊字符</div>
+                <div class="tool-name" id="toolUrl">URL 编解码</div>
+                <div class="tool-desc" id="descUrl">URL 编码和解码，处理特殊字符</div>
                 <div class="tool-tags">
                     <span class="tag">URL</span>
-                    <span class="tag">编码</span>
-                </div>
-            </div>
-            
-            <div class="tool-card" onclick="openTool('html')">
-                <div class="tool-icon">🌐</div>
-                <div class="tool-name">HTML 实体编解码</div>
-                <div class="tool-desc">HTML 特殊字符编码和解码</div>
-                <div class="tool-tags">
-                    <span class="tag">HTML</span>
-                    <span class="tag">实体</span>
-                </div>
-            </div>
-            
-            <div class="tool-card" onclick="openTool('jwt')">
-                <div class="tool-icon">🎫</div>
-                <div class="tool-name">JWT 解码</div>
-                <div class="tool-desc">JWT Token 解码和验证</div>
-                <div class="tool-tags">
-                    <span class="tag">JWT</span>
-                    <span class="tag">Token</span>
+                    <span class="tag">Encoder</span>
                 </div>
             </div>
         </div>
         
-        <div class="category-title"><span>🎨</span> Web 开发</div>
-        <div class="tools-grid">
-            <div class="tool-card" onclick="openTool('css')">
-                <div class="tool-icon">🎨</div>
-                <div class="tool-name">CSS 压缩/美化</div>
-                <div class="tool-desc">CSS 代码压缩和格式化</div>
-                <div class="tool-tags">
-                    <span class="tag">CSS</span>
-                    <span class="tag">压缩</span>
-                </div>
-            </div>
+        <footer>
+            <p id="footerMain">🛠️ DevTools - 开发者工具箱</p>
+            <p style="margin-top: 8px; font-size: 0.85rem;" id="footerSub">免费工具 · 无需注册 · 无广告</p>
             
-            <div class="tool-card" onclick="openTool('html-minify')">
-                <div class="tool-icon">📄</div>
-                <div class="tool-name">HTML 压缩</div>
-                <div class="tool-desc">HTML 代码压缩，移除多余空格和注释</div>
-                <div class="tool-tags">
-                    <span class="tag">HTML</span>
-                    <span class="tag">压缩</span>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">15+</div>
+                    <div class="stat-label" id="statTools">实用工具</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label" id="statFree">免费使用</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label" id="statReg">无需注册</div>
                 </div>
             </div>
-            
-            <div class="tool-card" onclick="openTool('js-minify')">
-                <div class="tool-icon">⚡</div>
-                <div class="tool-name">JS 压缩/美化</div>
-                <div class="tool-desc">JavaScript 代码压缩和格式化</div>
-                <div class="tool-tags">
-                    <span class="tag">JavaScript</span>
-                    <span class="tag">压缩</span>
-                </div>
-            </div>
-            
-            <div class="tool-card" onclick="openTool('color')">
-                <div class="tool-icon">🎨</div>
-                <div class="tool-name">颜色转换器</div>
-                <div class="tool-desc">HEX、RGB、HSL 颜色格式转换</div>
-                <div class="tool-tags">
-                    <span class="tag">颜色</span>
-                    <span class="tag">转换</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="category-title"><span>🔧</span> 实用工具</div>
-        <div class="tools-grid">
-            <div class="tool-card" onclick="openTool('diff')">
-                <div class="tool-icon">📑</div>
-                <div class="tool-name">文本对比</div>
-                <div class="tool-desc">对比两段文本的差异，高亮显示</div>
-                <div class="tool-tags">
-                    <span class="tag">Diff</span>
-                    <span class="tag">对比</span>
-                </div>
-            </div>
-            
-            <div class="tool-card" onclick="openTool('regex')">
-                <div class="tool-icon">🔍</div>
-                <div class="tool-name">正则表达式测试</div>
-                <div class="tool-desc">正则表达式在线测试和调试</div>
-                <div class="tool-tags">
-                    <span class="tag">Regex</span>
-                    <span class="tag">正则</span>
-                </div>
-            </div>
-            
-            <div class="tool-card" onclick="openTool('hash')">
-                <div class="tool-icon">#️⃣</div>
-                <div class="tool-name">哈希生成器</div>
-                <div class="tool-desc">MD5、SHA1、SHA256 哈希计算</div>
-                <div class="tool-tags">
-                    <span class="tag">哈希</span>
-                    <span class="tag">MD5</span>
-                </div>
-            </div>
-            
-            <div class="tool-card" onclick="openTool('timestamp')">
-                <div class="tool-icon">⏰</div>
-                <div class="tool-name">时间戳转换</div>
-                <div class="tool-desc">Unix 时间戳和日期时间互转</div>
-                <div class="tool-tags">
-                    <span class="tag">时间戳</span>
-                    <span class="tag">时间</span>
-                </div>
-            </div>
-            
-            <div class="tool-card" onclick="openTool('password')">
-                <div class="tool-icon">🔐</div>
-                <div class="tool-name">密码生成器</div>
-                <div class="tool-desc">生成强密码，支持自定义长度和字符</div>
-                <div class="tool-tags">
-                    <span class="tag">密码</span>
-                    <span class="tag">安全</span>
-                </div>
-            </div>
-            
-            <div class="tool-card" onclick="openTool('uuid')">
-                <div class="tool-icon">🆔</div>
-                <div class="tool-name">UUID 生成器</div>
-                <div class="tool-desc">生成 UUID/GUID，支持多种版本</div>
-                <div class="tool-tags">
-                    <span class="tag">UUID</span>
-                    <span class="tag">GUID</span>
-                </div>
-            </div>
-        </div>
+        </footer>
     </div>
     
-    <footer>
-        <p>🛠️ DevTools - 开发者工具箱</p>
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value">15+</div>
-                <div class="stat-label">实用工具</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">100%</div>
-                <div class="stat-label">免费使用</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">0</div>
-                <div class="stat-label">无需注册</div>
-            </div>
-        </div>
-        <p style="margin-top: 32px; font-size: 0.85rem;">免费工具 · 无需注册 · 无广告 · 纯前端处理</p>
-    </footer>
-    
     <script>
+        // 多语言配置
+        const i18n = {
+            zh: {
+                logo: '🛠️ DevTools',
+                tagline: '开发者工具箱 - 免费、快速、无需注册的在线工具集合',
+                searchPlaceholder: '搜索工具...',
+                catFormat: '📊 数据格式化',
+                toolJson: 'JSON 格式化',
+                descJson: 'JSON 美化、压缩、验证，支持语法高亮和错误提示',
+                toolBase64: 'Base64 编解码',
+                descBase64: 'Base64 编码和解码，支持文本和图片',
+                toolUrl: 'URL 编解码',
+                descUrl: 'URL 编码和解码，处理特殊字符',
+                footerMain: '🛠️ DevTools - 开发者工具箱',
+                footerSub: '免费工具 · 无需注册 · 无广告',
+                statTools: '实用工具',
+                statFree: '免费使用',
+                statReg: '无需注册'
+            },
+            en: {
+                logo: '🛠️ DevTools',
+                tagline: 'Developer Toolkit - Free, fast, no-registration online tools collection',
+                searchPlaceholder: 'Search tools...',
+                catFormat: '📊 Data Format',
+                toolJson: 'JSON Formatter',
+                descJson: 'JSON beautify, minify, validate with syntax highlighting',
+                toolBase64: 'Base64 Codec',
+                descBase64: 'Base64 encode and decode for text and images',
+                toolUrl: 'URL Codec',
+                descUrl: 'URL encode and decode for special characters',
+                footerMain: '🛠️ DevTools - Developer Toolkit',
+                footerSub: 'Free Tools · No Registration · No Ads',
+                statTools: 'Useful Tools',
+                statFree: 'Free to Use',
+                statReg: 'No Registration'
+            }
+        };
+        
+        let currentLang = 'zh';
+        
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (lang === 'zh' && btn.textContent.includes('中文')) ||
+                    (lang === 'en' && btn.textContent.includes('English'))
+                );
+            });
+            
+            // Update page title
+            document.getElementById('pageTitle').textContent = lang === 'zh' 
+                ? 'DevTools - 开发者工具箱'
+                : 'DevTools - Developer Toolkit';
+            document.getElementById('pageDesc').content = lang === 'zh'
+                ? '免费的在线开发者工具集合，包括 JSON 格式化、Base64 编解码、URL 编解码等常用工具'
+                : 'Free online developer tools collection including JSON formatter, Base64 codec, URL codec and more';
+            
+            // Update all text elements
+            const texts = i18n[lang];
+            document.getElementById('logo').textContent = texts.logo;
+            document.getElementById('tagline').textContent = texts.tagline;
+            document.getElementById('searchInput').placeholder = texts.searchPlaceholder;
+            document.getElementById('catFormat').innerHTML = `<span>📊</span> ${texts.catFormat.replace('📊 ', '')}`;
+            document.getElementById('toolJson').textContent = texts.toolJson;
+            document.getElementById('descJson').textContent = texts.descJson;
+            document.getElementById('toolBase64').textContent = texts.toolBase64;
+            document.getElementById('descBase64').textContent = texts.descBase64;
+            document.getElementById('toolUrl').textContent = texts.toolUrl;
+            document.getElementById('descUrl').textContent = texts.descUrl;
+            document.getElementById('footerMain').textContent = texts.footerMain;
+            document.getElementById('footerSub').textContent = texts.footerSub;
+            document.getElementById('statTools').textContent = texts.statTools;
+            document.getElementById('statFree').textContent = texts.statFree;
+            document.getElementById('statReg').textContent = texts.statReg;
+        }
+        
         // 搜索功能
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
@@ -463,27 +423,28 @@
         // 打开工具
         function openTool(tool) {
             const urls = {
-                'json': '/tools/json.html',
-                'sql': '/tools/sql.html',
-                'xml': '/tools/xml.html',
-                'base64': '/tools/base64.html',
-                'url': '/tools/url.html',
-                'html': '/tools/html-entity.html',
-                'jwt': '/tools/jwt.html',
-                'css': '/tools/css.html',
-                'html-minify': '/tools/html-minify.html',
-                'js-minify': '/tools/js-minify.html',
-                'color': '/tools/color.html',
-                'diff': '/tools/diff.html',
-                'regex': '/tools/regex.html',
-                'hash': '/tools/hash.html',
-                'timestamp': '/tools/timestamp.html',
-                'password': '/tools/password.html',
-                'uuid': '/tools/uuid.html'
+                json: '/tools/json.html',
+                base64: '/tools/base64.html',
+                url: '/tools/url.html'
             };
             
-            // 暂时显示提示，实际工具页面可以后续添加
-            alert('工具页面开发中：' + tool + '\n\n这是一个工具导航首页，具体工具页面可以逐步添加。');
+            // For now, show alert that tool is coming soon
+            const toolNames = {
+                zh: { json: 'JSON 格式化', base64: 'Base64 编解码', url: 'URL 编解码' },
+                en: { json: 'JSON Formatter', base64: 'Base64 Codec', url: 'URL Codec' }
+            };
+            
+            const msg = currentLang === 'zh' 
+                ? `${toolNames.zh[tool]} 工具页面开发中，敬请期待！`
+                : `${toolNames.en[tool]} tool page is under development, coming soon!`;
+            
+            alert(msg);
+        }
+        
+        // 初始化语言
+        const browserLang = navigator.language || navigator.userLanguage;
+        if (browserLang && browserLang.startsWith('en')) {
+            setLang('en');
         }
     </script>
 </body>
