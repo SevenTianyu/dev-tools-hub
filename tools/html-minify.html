@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Minifier - DevTools</title>
+    <meta name="description" content="Online HTML minifier and beautifier. Compress HTML to reduce file size or format it for better readability.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .back-btn:hover {
+            color: var(--primary);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .lang-switcher {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .lang-btn {
+            padding: 6px 12px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+        
+        .tool-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .tool-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .panel-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 16px;
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #e6edf3;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .options {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .option label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 24px;
+            padding: 16px;
+            background: var(--surface);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="back-btn">← 返回工具箱</a>
+            <div class="logo">🛠️ DevTools</div>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+                <button class="lang-btn" onclick="setLang('en')">English</button>
+            </div>
+        </header>
+        
+        <h1>📄 HTML 压缩/美化</h1>
+        <p class="subtitle">压缩 HTML 减少文件大小，或美化代码提高可读性</p>
+        
+        <div class="options">
+            <div class="option">
+                <input type="checkbox" id="removeComments" checked>
+                <label for="removeComments">移除注释</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="removeEmpty" checked>
+                <label for="removeEmpty">移除空行</label>
+            </div>
+            <div class="option">
+                <input type="checkbox" id="collapseWhitespace" checked>
+                <label for="collapseWhitespace">合并空格</label>
+            </div>
+        </div>
+        
+        <div class="tool-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">输入 HTML</span>
+                    <div class="panel-actions">
+                        <button class="btn btn-secondary" onclick="loadSample()">加载示例</button>
+                        <button class="btn btn-secondary" onclick="clearInput()">清空</button>
+                    </div>
+                </div>
+                <textarea id="input" placeholder="在此粘贴你的 HTML 代码..."><!DOCTYPE html>
+<html>
+<head>
+    <title>Example Page</title>
+    <!-- This is a comment -->
+</head>
+<body>
+    <h1>Hello World</h1>
+    <p>This is a paragraph.</p>
+</body>
+</html></textarea>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">结果</span>
+                    <div class="panel-actions">
+                        <button class="btn btn-success" onclick="minify()">📦 压缩</button>
+                        <button class="btn btn-secondary" onclick="beautify()">✨ 美化</button>
+                        <button class="btn btn-secondary" onclick="copyResult()">📋 复制</button>
+                    </div>
+                </div>
+                <textarea id="output" readonly placeholder="点击按钮查看结果..."></textarea>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="inputSize">0</div>
+                <div class="stat-label">输入大小</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="outputSize">0</div>
+                <div class="stat-label">输出大小</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="savings">0%</div>
+                <div class="stat-label">节省</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const i18n = {
+            zh: {
+                back: '← 返回工具箱',
+                title: 'HTML 压缩/美化',
+                subtitle: '压缩 HTML 减少文件大小，或美化代码提高可读性',
+                removeComments: '移除注释',
+                removeEmpty: '移除空行',
+                collapseWhitespace: '合并空格',
+                input: '输入 HTML',
+                loadSample: '加载示例',
+                clear: '清空',
+                output: '结果',
+                minify: '📦 压缩',
+                beautify: '✨ 美化',
+                copy: '📋 复制',
+                inputSize: '输入大小',
+                outputSize: '输出大小',
+                savings: '节省',
+                copied: '已复制到剪贴板！'
+            },
+            en: {
+                back: '← Back to Tools',
+                title: 'HTML Minifier/Beautifier',
+                subtitle: 'Minify HTML to reduce size or beautify for readability',
+                removeComments: 'Remove Comments',
+                removeEmpty: 'Remove Empty Lines',
+                collapseWhitespace: 'Collapse Whitespace',
+                input: 'Input HTML',
+                loadSample: 'Load Sample',
+                clear: 'Clear',
+                output: 'Output',
+                minify: '📦 Minify',
+                beautify: '✨ Beautify',
+                copy: '📋 Copy',
+                inputSize: 'Input Size',
+                outputSize: 'Output Size',
+                savings: 'Savings',
+                copied: 'Copied to clipboard!'
+            }
+        };
+        
+        let currentLang = 'zh';
+        
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (lang === 'zh' && btn.textContent.includes('中文')) ||
+                    (lang === 'en' && btn.textContent.includes('English'))
+                );
+            });
+            
+            const t = i18n[lang];
+            document.querySelector('.back-btn').textContent = t.back;
+            document.querySelector('h1').textContent = '📄 ' + t.title;
+            document.querySelector('.subtitle').textContent = t.subtitle;
+            
+            document.querySelector('label[for="removeComments"]').textContent = t.removeComments;
+            document.querySelector('label[for="removeEmpty"]').textContent = t.removeEmpty;
+            document.querySelector('label[for="collapseWhitespace"]').textContent = t.collapseWhitespace;
+            
+            document.querySelectorAll('.panel-title')[0].textContent = t.input;
+            document.querySelectorAll('.btn-secondary')[0].textContent = t.loadSample;
+            document.querySelectorAll('.btn-secondary')[1].textContent = t.clear;
+            document.querySelectorAll('.panel-title')[1].textContent = t.output;
+            
+            document.querySelectorAll('.btn-success')[0].textContent = t.minify;
+            document.querySelectorAll('.btn-secondary')[2].textContent = t.beautify;
+            document.querySelectorAll('.btn-secondary')[3].textContent = t.copy;
+            
+            document.querySelectorAll('.stat-label')[0].textContent = t.inputSize;
+            document.querySelectorAll('.stat-label')[1].textContent = t.outputSize;
+            document.querySelectorAll('.stat-label')[2].textContent = t.savings;
+        }
+        
+        function minify() {
+            let html = document.getElementById('input').value;
+            const removeComments = document.getElementById('removeComments').checked;
+            const removeEmpty = document.getElementById('removeEmpty').checked;
+            const collapseWhitespace = document.getElementById('collapseWhitespace').checked;
+            
+            if (removeComments) {
+                html = html.replace(/<!--[\s\S]*?-->/g, '');
+            }
+            
+            if (collapseWhitespace) {
+                html = html.replace(/\s+/g, ' ');
+            }
+            
+            if (removeEmpty) {
+                html = html.replace(/^\s*\n/gm, '');
+            }
+            
+            html = html.trim();
+            
+            document.getElementById('output').value = html;
+            updateStats();
+        }
+        
+        function beautify() {
+            let html = document.getElementById('input').value;
+            
+            // Simple beautification
+            html = html.replace(/\u003e\s*\u003c/g, '>\n<');
+            html = html.replace(/\u003c([^\/][^\u003e]*)\u003e/g, '\n<$1>');
+            
+            const lines = html.split('\n');
+            let indent = 0;
+            const result = [];
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+                
+                if (line.match(/^\u003c\/\w/)) {
+                    indent = Math.max(0, indent - 1);
+                }
+                
+                result.push('  '.repeat(indent) + line);
+                
+                if (line.match(/^\u003c\w[^\/]*\u003e$/)) {
+                    indent++;
+                }
+            }
+            
+            document.getElementById('output').value = result.join('\n');
+            updateStats();
+        }
+        
+        function updateStats() {
+            const input = document.getElementById('input').value;
+            const output = document.getElementById('output').value;
+            
+            const inputSize = new Blob([input]).size;
+            const outputSize = new Blob([output]).size;
+            const savings = inputSize > 0 ? ((1 - outputSize / inputSize) * 100).toFixed(1) : 0;
+            
+            document.getElementById('inputSize').textContent = inputSize + ' B';
+            document.getElementById('outputSize').textContent = outputSize + ' B';
+            document.getElementById('savings').textContent = savings + '%';
+        }
+        
+        function copyResult() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+            alert(i18n[currentLang].copied);
+        }
+        
+        function loadSample() {
+            const sample = `<!DOCTYPE html>
+<html>
+<head>
+    <title>Example Page</title>
+    <!-- This is a comment -->
+</head>
+<body>
+    <h1>Hello World</h1>
+    <p>This is a paragraph.</p>
+</body>
+</html>`;
+            document.getElementById('input').value = sample.trim();
+            updateStats();
+        }
+        
+        function clearInput() {
+            document.getElementById('input').value = '';
+            document.getElementById('output').value = '';
+            document.getElementById('inputSize').textContent = '0';
+            document.getElementById('outputSize').textContent = '0';
+            document.getElementById('savings').textContent = '0%';
+        }
+        
+        window.onload = () => {
+            const browserLang = navigator.language || navigator.userLanguage;
+            if (browserLang && browserLang.startsWith('en')) {
+                setLang('en');
+            }
+            updateStats();
+        };
+    </script>
+</body>
+</html>
